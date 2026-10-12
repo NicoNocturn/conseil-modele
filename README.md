@@ -61,6 +61,20 @@ Pour l'essayer sans toucher à tes réglages : `claude --plugin-dir /chemin/vers
 
 `fichierRegles` : le chemin d'un fichier Markdown dont la section `## Modèle` contient ta propre règle sur les modèles. Le mod la relit à chaque conseil, donc tu la gardes là où tu l'écris déjà (un `CLAUDE.md`, par exemple). Vide, il applique la règle par défaut. Le réglage se change dans `/config`.
 
+### Adapter la règle à ton forfait
+
+La règle par défaut met tout le travail sur Opus. Elle tient sur un gros forfait ; sur un plus petit, elle épuise la semaine avant la fin. Le mod peut conseiller Haiku, Sonnet, Opus ou Fable : c'est ta règle qui dit lesquels il propose. Par exemple :
+
+```markdown
+## Modèle
+
+- Sonnet pour les gestes mécaniques et les tâches qui suivent une recette connue.
+- Opus dès qu'il faut du jugement ou qu'un texte sort.
+- Fable seulement pour un problème vraiment difficile, annoncé comme tel.
+```
+
+Choisis le modèle en ouvrant la session, d'après le gros de ce que tu vas y faire, et laisse le mod ajuster l'effort pendant : changer de modèle fait relire toute la conversation, changer d'effort non.
+
 ## Tester
 
 ```bash

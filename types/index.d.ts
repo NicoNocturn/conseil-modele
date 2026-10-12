@@ -1,5 +1,5 @@
 export type Effort = 'low' | 'medium' | 'high' | 'xhigh' | 'max'
-export type Modele = 'Opus' | 'Fable'
+export type Modele = 'Haiku' | 'Sonnet' | 'Opus' | 'Fable'
 
 /** Le conseil rendu pour la dernière demande substantielle. */
 export type Conseil = { modele: Modele; effort: Effort; raison: string }

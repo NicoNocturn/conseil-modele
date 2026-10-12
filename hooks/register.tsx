@@ -1,13 +1,18 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Conseil, Effort, Reglage } from '../types'
+import type { Conseil, Effort, Modele, Reglage } from '../types'
 
 const conseil = atom({ plugin: 'conseil-modele', key: 'conseil' } as const, null)
 const reglage = atom({ plugin: 'conseil-modele', key: 'reglage' } as const, null)
 const enCours = atom({ plugin: 'conseil-modele', key: 'enCours' } as const, false)
 
 const EFFORTS: readonly Effort[] = ['low', 'medium', 'high', 'xhigh', 'max']
+
+// Les modèles que le conseil peut nommer. Lesquels il nomme vraiment, c'est la règle de
+// l'utilisateur qui le dit : la règle par défaut s'en tient à Opus et Fable, une règle
+// écrite pour un plus petit forfait peut faire descendre sur Sonnet ou Haiku.
+const MODELES: readonly Modele[] = ['Haiku', 'Sonnet', 'Opus', 'Fable']
 
 // La règle sur les modèles se lit, quand le réglage `fichierRegles` en nomme un, dans la section
 // « ## Modèle » de ce fichier Markdown, relue à chaque conseil : on garde sa règle là où on
@@ -30,9 +35,9 @@ const ORIGINES_HUMAINES = new Set(['composer', 'bridge', 'sdk', 'unclassified'])
 
 function systeme(regleModeles: string): string {
   return `Tu conseilles une personne qui travaille dans Claude Code sur le modèle et le niveau d'effort à régler pour la tâche en cours. Tu lis la fin de la conversation et sa nouvelle demande, puis tu réponds par un seul objet JSON, sans rien autour :
-{"modele": "Opus" ou "Fable", "effort": "low" | "medium" | "high" | "xhigh" | "max", "raison": "une phrase de 15 mots au plus, en français, qui nomme la tâche et ce qui décide"}
+{"modele": "Haiku" | "Sonnet" | "Opus" | "Fable", "effort": "low" | "medium" | "high" | "xhigh" | "max", "raison": "une phrase de 15 mots au plus, en français, qui nomme la tâche et ce qui décide"}
 
-Sa règle sur les modèles, à appliquer telle quelle (tu ne conseilles jamais Sonnet ni Haiku) :
+Sa règle sur les modèles, à appliquer telle quelle (tu ne conseilles que les modèles qu'elle permet) :
 ${regleModeles}
 
 Prix par million de tokens, entrée puis sortie : Opus 5.5 à 4 et 20 $, Fable 5.1 à 10 et 50 $. Fable coûte 2,5 fois Opus.
@@ -56,7 +61,7 @@ export function lireReponse(texte: string): Conseil | null {
   if (bloc === null) return null
   try {
     const o = JSON.parse(bloc[0]) as Record<string, unknown>
-    const modele = o.modele === 'Opus' || o.modele === 'Fable' ? o.modele : null
+    const modele = MODELES.find(nom => nom === o.modele) ?? null
     const effort = EFFORTS.find(niveau => niveau === o.effort)
     if (modele === null || effort === undefined) return null
     const raison = typeof o.raison === 'string' ? o.raison.replace(/\s*\u2014\s*/g, ', ').trim() : ''
@@ -92,7 +97,7 @@ export function gestesDe(c: Conseil, e: Ecart): string[] {
   } else if (e.modele === 'monter' && c.modele === 'Fable') {
     gestes.push('Passe en Fable seulement si la difficulté est réelle : il relit toute la conversation à son prix, puis coûte 2,5 fois Opus par prompt.')
   } else if (e.modele === 'monter') {
-    gestes.push(`Passe en ${c.modele} : ta règle met tout le travail sur Opus.`)
+    gestes.push(`Passe en ${c.modele} : la tâche le demande, et ta règle le prévoit.`)
   }
   if (e.effort > 0) gestes.push(`Monte l'effort à ${c.effort} : changer d'effort ne fait pas relire la conversation.`)
   if (e.effort < 0) gestes.push(`Baisse l'effort à ${c.effort} : changer d'effort ne fait pas relire la conversation.`)

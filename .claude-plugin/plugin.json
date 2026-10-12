@@ -1,6 +1,6 @@
 {
   "name": "conseil-modele",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Conseille le modèle et l'effort à régler pour la tâche en cours, à côté du sélecteur.",
   "author": { "name": "Nicolas Duvillard" },
   "license": "MIT",

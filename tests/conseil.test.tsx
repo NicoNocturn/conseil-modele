@@ -77,7 +77,9 @@ async function texteDe($: Engine, cible: typeof BANDE | typeof PIED, surface: (t
 
 test('lit la réponse du modèle et refuse ce qui sort de la grille', () => {
   expect(lireReponse(REPONSE)).toEqual({ modele: 'Fable', effort: 'xhigh', raison: "Audit d'architecture, long et imbriqué" })
-  expect(lireReponse('{"modele":"Sonnet","effort":"low","raison":"x"}')).toBeNull()
+  // Sonnet et Haiku se lisent : c'est la règle de l'utilisateur qui dit s'il y descend.
+  expect(lireReponse('{"modele":"Sonnet","effort":"low","raison":"x"}')).toEqual({ modele: 'Sonnet', effort: 'low', raison: 'x' })
+  expect(lireReponse('{"modele":"GPT","effort":"low","raison":"x"}')).toBeNull()
   expect(lireReponse('{"modele":"Opus","effort":"énorme"}')).toBeNull()
   expect(lireReponse('pas de json')).toBeNull()
   expect(nomModele('claude-fable-5-1[1m]')).toBe('Fable')
@@ -100,6 +102,8 @@ test('une demande de fond donne un conseil, lu dans la bande et au pied', { opti
 
   expect(systemes).toHaveLength(1)
   expect(systemes[0]).toContain('REGLE-TEST : Opus partout.')
+  expect(systemes[0]).toContain('tu ne conseilles que les modèles qu')
+  expect(systemes[0]).not.toContain('jamais Sonnet')
   expect(systemes[0]).not.toContain('autre section')
   for (const surface of SURFACES) {
     expect(await texteDe($, BANDE, surface)).toContain('Conseil : Fable · xhigh')
