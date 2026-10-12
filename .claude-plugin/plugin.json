@@ -1,0 +1,16 @@
+{
+  "name": "conseil-modele",
+  "version": "0.2.0",
+  "description": "Conseille le modèle et l'effort à régler pour la tâche en cours, à côté du sélecteur.",
+  "author": { "name": "Nicolas Duvillard" },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "fichierRegles": {
+      "type": "string",
+      "title": "Fichier de règles",
+      "description": "Chemin d'un fichier Markdown dont la section « ## Modèle » donne ta règle sur les modèles (un CLAUDE.md, par exemple). Vide : la règle par défaut du mod.",
+      "default": ""
+    }
+  }
+}
